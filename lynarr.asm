@@ -21,12 +21,12 @@ asm_main:
 
 	;Check arguments
 	mov eax, dword [ebp+8] 			;moves first arg to eax
-	cmp eax, dword 2 				;checks if it has 2 args.
+	cmp eax, dword 2 			;checks if it has 2 args.
 	je Init							
 
 	;Print error and quit 
 	mov eax, argumentError			;calls error 
-	call print_string				;print error message
+	call print_string			;print error message
 	jmp Done 					
 
 	Init:
@@ -37,50 +37,50 @@ asm_main:
 		mov ecx, 0
 
 	CountLength:
-		mov al, byte [ebx]			;takes first byte/letter from ebx into al.
-		cmp byte [ebx], 0			;checks if next char is blank
+		mov al, byte [ebx]		;takes first byte/letter from ebx into al.
+		cmp byte [ebx], 0		;checks if next char is blank
 		je Next	
 		cmp byte [ebx], 'a'
 		jb CaseError
 		cmp byte [ebx], 'z'
 		ja CaseError
 		inc ecx
-		inc ebx						;move to next char
+		inc ebx				;move to next char
 		jmp CountLength
 
 	Next:
 		cmp ecx, 20			
-		ja LenError 				;>20
+		ja LenError 			;>20
 		mov [N], ecx
-		mov ecx, 0					;set counter to 0 again
+		mov ecx, 0			;set counter to 0 again
 		mov ebx, edx
 
 	ToArray:
-		mov al, byte [ebx]			;takes first byte/letter from ebx into al.
-		cmp byte [ebx], 0			;checks if next char is blank
+		mov al, byte [ebx]		;takes first byte/letter from ebx into al.
+		cmp byte [ebx], 0		;checks if next char is blank
 		je DoneArray
 		mov edx, X
 		add edx, ecx
 		mov [edx], al
-		inc ebx						;move to next char
+		inc ebx				;move to next char
 		inc ecx
 		jmp ToArray
 
 	DoneArray:
-		mov edx, X					;X[N] = 0
+		mov edx, X			;X[N] = 0
 		add edx, ecx
 		mov [edx], al
 		push X
 		push dword [N]
 		push dword 0
 		call display
-		add esp, 12					;restore the stack
+		add esp, 12			;restore the stack
 		mov [k], dword 0
 
 	CallMaxLyn:
-		push X						;Z 
-		push dword [N]				;N
-		push dword [k]				;k
+		push X				;Z 
+		push dword [N]			;N
+		push dword [k]			;k
 		call maxLyn 				
 		add esp, 12
 		inc dword[k]
@@ -99,13 +99,13 @@ asm_main:
 
 	LenError:
 		mov eax, lengthError		;calls error 
-		call print_string			;print error message
+		call print_string		;print error message
 		call print_nl
 		jmp Done
 
 	CaseError:
-		mov eax, lowerError			;calls error 
-		call print_string			;print error message
+		mov eax, lowerError		;calls error 
+		call print_string		;print error message
 		call print_nl
 		jmp Done
 		
@@ -116,21 +116,21 @@ asm_main:
 		ret
 
 global display
-display:							;displays an array's contents
+display:					;displays an array's contents
 	enter 0,0           
 	mov ebx, dword[ebp+16]			;X arg
 	mov ecx, dword[ebp+12]			;N arg
 	mov edx, dword[ebp+8]			;Flag
-	cmp edx, dword 0				;0 for chars, 1 for nums
+	cmp edx, dword 0			;0 for chars, 1 for nums
 	jne DisplayNums
 
 	DisplayChars:
 		cmp ecx, dword 0
 		jbe TillEnter
-		mov al, byte [ebx]			;takes first byte/letter from ebx into al.
+		mov al, byte [ebx]		;takes first byte/letter from ebx into al.
 		call print_char
 		dec ecx
-		inc ebx						;move to next char
+		inc ebx				;move to next char
 		jmp DisplayChars
 
 	DisplayNums:
@@ -141,11 +141,11 @@ display:							;displays an array's contents
 		mov al, ' '
 		call print_char
 		dec ecx
-		add ebx, dword 4			;move to next char
+		add ebx, dword 4		;move to next char
 		jmp DisplayNums
 
 	TillEnter:
-		call read_char				;must press enter to leave input
+		call read_char			;must press enter to leave input
 		jmp Return
 
 	Return:
@@ -153,40 +153,40 @@ display:							;displays an array's contents
 		ret
 
 global maxLyn
-maxLyn:								;computes the maxLyn algorithm
+maxLyn:						;computes the maxLyn algorithm
 	enter 0,0       
 	mov eax, dword[ebp+16]			;eax = X
 	mov ecx, dword[ebp+12]			;ecx = N
 	mov edx, dword[ebp+8]			;edx = k
 
 	mov [nUnder], ecx
-	dec dword[nUnder]				;ecx = n-1
+	dec dword[nUnder]			;ecx = n-1
 	cmp edx, dword[nUnder]			;if k = n-1
 	je Return1
 	mov [max], dword 1
 	mov ebx, edx
-	inc ebx							;ebx = i = k+1
-	Loop:							;k+1 to n-1
+	inc ebx					;ebx = i = k+1
+	Loop:					;k+1 to n-1
 		cmp ebx, dword[N] 		
 		je Return2
-		add eax, ebx				;add i
+		add eax, ebx			;add i
 
-		sub eax, dword[max]			;i-max
+		sub eax, dword[max]		;i-max
 		mov cl, byte[eax]
 
-		add eax, dword[max]			;eax = Z[i] -> i-max+max = i
+		add eax, dword[max]		;eax = Z[i] -> i-max+max = i
 
-		cmp cl, byte[eax]			;if Z[i-p] != Z[i]
+		cmp cl, byte[eax]		;if Z[i-p] != Z[i]
 		je IncrementLoop
-		cmp cl, byte[eax]			;if Z[i-p] > Z[i]
+		cmp cl, byte[eax]		;if Z[i-p] > Z[i]
 		jg Return2
 
-		mov [max], ebx				;max = p=i+1-k
+		mov [max], ebx			;max = p=i+1-k
 		inc dword[max]
 		sub [max], edx
 
 	IncrementLoop:	
-		sub eax, ebx				;reset pointer
+		sub eax, ebx			;reset pointer
 		inc ebx
 		jmp Loop
 	
